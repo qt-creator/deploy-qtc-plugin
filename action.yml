@@ -1,23 +1,47 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Deploy Qt Creator Extension'
+description: 'Deploys a Qt Creator Extension to the Qt Creator Extension Store'
+author: 'The Qt Company'
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
   icon: 'heart'
-  color: 'red'
+  color: 'green'
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  spec:
+    description: 'Path to the plugin spec'
     required: true
-    default: '1000'
+  api:
+    description: 'Path to the Extension store api'
+    required: true
+  token:
+    description: 'Your API Token for the Extension Store'
+    required: true
+  download-url-win-x64:
+    description: 'The url to download the extension from (for Windows x64)'
+    required: true
+  download-url-win-arm:
+    description: 'The url to download the extension from (for Windows ARM64)'
+    required: true
+  download-url-macos:
+    description: 'The url to download the extension from (for macOS Universal)'
+    required: true
+  download-url-linux-x64:
+    description: 'The url to download the extension from (for Linux x64)'
+    required: true
+  download-url-linux-arm:
+    description: 'The url to download the extension from (for Linux ARM64)'
+    required: true
+  publish:
+    description: 'Whether to immediately set status to "published"'
+    required: false
+    default: 'false'
 
 # Define your outputs here.
-outputs:
-  time:
-    description: 'Your output description here'
+#outputs:
+#  time:
+#    description: 'Your output description here'
 
 runs:
   using: node20

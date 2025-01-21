@@ -1,5 +1,12 @@
 import * as core from '@actions/core'
-import { wait } from './wait'
+import { promises as fs } from 'fs'
+import {
+  createOrUpdateExtension,
+  PluginMetaData,
+  DownloadUrls
+} from './extensionstore'
+
+// Import fs
 
 /**
  * The main function for the action.
@@ -7,18 +14,44 @@ import { wait } from './wait'
  */
 export async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
+    const specPath: string = core.getInput('spec')
+    const isTest: boolean =
+      core.getInput('test', { required: false }) === 'true'
+    const api: string = core.getInput('api')
+    const token: string = core.getInput('token')
+    const publish: boolean =
+      core.getInput('publish', { required: false }) === 'true'
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    const downloadUrls: DownloadUrls = {
+      winx64: core.getInput('download-url-win-x64', { required: false }),
+      winarm64: core.getInput('download-url-win-arm64', { required: false }),
+      linuxx64: core.getInput('download-url-linux-x64', { required: false }),
+      linuxarm64: core.getInput('download-url-linux-arm64', {
+        required: false
+      }),
+      macos: core.getInput('download-url-macos', { required: false })
+    }
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const spec = await fs.readFile(specPath)
+    const asJson = JSON.parse(spec.toString())
 
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    core.debug(`Parsed spec: ${JSON.stringify(asJson)}`)
+
+    if (isTest) {
+      // console.log(asJson)
+      // The following only works with secret keys etc.
+      return
+    }
+
+    await createOrUpdateExtension(
+      downloadUrls,
+      asJson as unknown as PluginMetaData,
+      api,
+      token,
+      publish
+    )
+
+    //core.setOutput('outputJson', asJson)
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)

@@ -24920,6 +24920,117 @@ exports["default"] = _default;
 
 /***/ }),
 
+/***/ 3906:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createOrUpdateExtension = createOrUpdateExtension;
+const core = __importStar(__nccwpck_require__(2186));
+function createPluginRequest(pluginMetaData, publish, downloadUrls) {
+    const sources = [
+        {
+            url: downloadUrls.winx64,
+            platform: {
+                name: 'Windows',
+                architecture: 'x86_64'
+            }
+        },
+        {
+            url: downloadUrls.winarm64,
+            platform: {
+                name: 'Windows',
+                architecture: 'arm64'
+            }
+        },
+        {
+            url: downloadUrls.linuxx64,
+            platform: {
+                name: 'Linux',
+                architecture: 'x86_64'
+            }
+        },
+        {
+            url: downloadUrls.linuxarm64,
+            platform: {
+                name: 'Linux',
+                architecture: 'arm64'
+            }
+        },
+        {
+            url: downloadUrls.macos,
+            platform: {
+                name: 'macOS',
+                architecture: 'x86_64'
+            }
+        }
+    ].filter(source => source.url);
+    return {
+        id: pluginMetaData.Id,
+        display_name: pluginMetaData.Name,
+        license: 'open-source',
+        status: publish ? 'published' : 'unpublished',
+        is_latest: publish,
+        tags: pluginMetaData.Tags,
+        plugin: {
+            metadata: pluginMetaData,
+            sources
+        }
+    };
+}
+async function request(type, url, token, data
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+) {
+    core.debug(`Requesting ${url}, method: ${type}, data: ${data}`);
+    const response = await fetch(url, {
+        method: type,
+        headers: {
+            Authorization: `Bearer ${token}`,
+            accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: data ? data : undefined
+    });
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP Error: ${[response.status, response.statusText, errorText].filter(s => s).join(', ')}`);
+    }
+    return await response.json();
+}
+async function createOrUpdateExtension(downloadUrls, pluginMetaData, apiUrl, apiToken, publish) {
+    core.debug(`Creating or updating extension ${pluginMetaData.Name}`);
+    const pluginRequest = JSON.stringify(createPluginRequest(pluginMetaData, publish, downloadUrls));
+    const url = new URL('/api/v1/management/plugins', apiUrl);
+    await request('POST', url.toString(), apiToken, pluginRequest);
+}
+
+
+/***/ }),
+
 /***/ 399:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -24951,52 +25062,45 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = run;
 const core = __importStar(__nccwpck_require__(2186));
-const wait_1 = __nccwpck_require__(5259);
+const fs_1 = __nccwpck_require__(7147);
+const extensionstore_1 = __nccwpck_require__(3906);
+// Import fs
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 async function run() {
     try {
-        const ms = core.getInput('milliseconds');
-        // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-        core.debug(`Waiting ${ms} milliseconds ...`);
-        // Log the current timestamp, wait, then log the new timestamp
-        core.debug(new Date().toTimeString());
-        await (0, wait_1.wait)(parseInt(ms, 10));
-        core.debug(new Date().toTimeString());
-        // Set outputs for other workflow steps to use
-        core.setOutput('time', new Date().toTimeString());
+        const specPath = core.getInput('spec');
+        const isTest = core.getInput('test', { required: false }) === 'true';
+        const api = core.getInput('api');
+        const token = core.getInput('token');
+        const publish = core.getInput('publish', { required: false }) === 'true';
+        const downloadUrls = {
+            winx64: core.getInput('download-url-win-x64', { required: false }),
+            winarm64: core.getInput('download-url-win-arm64', { required: false }),
+            linuxx64: core.getInput('download-url-linux-x64', { required: false }),
+            linuxarm64: core.getInput('download-url-linux-arm64', {
+                required: false
+            }),
+            macos: core.getInput('download-url-macos', { required: false })
+        };
+        const spec = await fs_1.promises.readFile(specPath);
+        const asJson = JSON.parse(spec.toString());
+        core.debug(`Parsed spec: ${JSON.stringify(asJson)}`);
+        if (isTest) {
+            // console.log(asJson)
+            // The following only works with secret keys etc.
+            return;
+        }
+        await (0, extensionstore_1.createOrUpdateExtension)(downloadUrls, asJson, api, token, publish);
+        //core.setOutput('outputJson', asJson)
     }
     catch (error) {
         // Fail the workflow run if an error occurs
         if (error instanceof Error)
             core.setFailed(error.message);
     }
-}
-
-
-/***/ }),
-
-/***/ 5259:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.wait = wait;
-/**
- * Wait for a number of milliseconds.
- * @param milliseconds The number of milliseconds to wait.
- * @returns {Promise<string>} Resolves with 'done!' after the wait is over.
- */
-async function wait(milliseconds) {
-    return new Promise(resolve => {
-        if (isNaN(milliseconds)) {
-            throw new Error('milliseconds not a number');
-        }
-        setTimeout(() => resolve('done!'), milliseconds);
-    });
 }
 
 
