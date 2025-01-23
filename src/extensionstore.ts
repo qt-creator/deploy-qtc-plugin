@@ -49,7 +49,8 @@ export interface DownloadUrls {
   winarm64?: string
   linuxx64?: string
   linuxarm64?: string
-  macos?: string
+  macosx64?: string
+  macosarm64?: string
 }
 
 function createPluginRequest(
@@ -87,10 +88,17 @@ function createPluginRequest(
       }
     },
     {
-      url: downloadUrls.macos,
+      url: downloadUrls.macosx64,
       platform: {
         name: 'macOS',
         architecture: 'x86_64'
+      }
+    },
+    {
+      url: downloadUrls.macosarm64,
+      platform: {
+        name: 'macOS',
+        architecture: 'arm64'
       }
     }
   ].filter(source => source.url) as PluginSource[]

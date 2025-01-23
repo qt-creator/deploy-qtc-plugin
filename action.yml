@@ -21,16 +21,19 @@ inputs:
   download-url-win-x64:
     description: 'The url to download the extension from (for Windows x64)'
     required: true
-  download-url-win-arm:
+  download-url-win-arm64:
     description: 'The url to download the extension from (for Windows ARM64)'
     required: true
-  download-url-macos:
-    description: 'The url to download the extension from (for macOS Universal)'
+  download-url-macos-x64:
+    description: 'The url to download the extension from (for macOS x86)'
+    required: true
+  download-url-macos-arm64:
+    description: 'The url to download the extension from (for macOS ARM64)'
     required: true
   download-url-linux-x64:
     description: 'The url to download the extension from (for Linux x64)'
     required: true
-  download-url-linux-arm:
+  download-url-linux-arm64:
     description: 'The url to download the extension from (for Linux ARM64)'
     required: true
   publish:

@@ -29,7 +29,10 @@ export async function run(): Promise<void> {
       linuxarm64: core.getInput('download-url-linux-arm64', {
         required: false
       }),
-      macos: core.getInput('download-url-macos', { required: false })
+      macosarm64: core.getInput('download-url-macos-arm64', {
+        required: false
+      }),
+      macosx64: core.getInput('download-url-macos-x64', { required: false })
     }
 
     const spec = await fs.readFile(specPath)

@@ -24982,10 +24982,17 @@ function createPluginRequest(pluginMetaData, publish, downloadUrls) {
             }
         },
         {
-            url: downloadUrls.macos,
+            url: downloadUrls.macosx64,
             platform: {
                 name: 'macOS',
                 architecture: 'x86_64'
+            }
+        },
+        {
+            url: downloadUrls.macosarm64,
+            platform: {
+                name: 'macOS',
+                architecture: 'arm64'
             }
         }
     ].filter(source => source.url);
@@ -25083,7 +25090,10 @@ async function run() {
             linuxarm64: core.getInput('download-url-linux-arm64', {
                 required: false
             }),
-            macos: core.getInput('download-url-macos', { required: false })
+            macosarm64: core.getInput('download-url-macos-arm64', {
+                required: false
+            }),
+            macosx64: core.getInput('download-url-macos-x64', { required: false })
         };
         const spec = await fs_1.promises.readFile(specPath);
         const asJson = JSON.parse(spec.toString());
