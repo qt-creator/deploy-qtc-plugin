@@ -25093,7 +25093,6 @@ async function run() {
             // The following only works with secret keys etc.
             return;
         }
-        console.log('UPLOAD:', downloadUrls);
         await (0, extensionstore_1.createOrUpdateExtension)(downloadUrls, asJson, api, token, publish);
         //core.setOutput('outputJson', asJson)
     }
