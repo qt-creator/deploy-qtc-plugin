@@ -25093,13 +25093,12 @@ async function run() {
             // The following only works with secret keys etc.
             return;
         }
+        console.log('UPLOAD:', downloadUrls);
         await (0, extensionstore_1.createOrUpdateExtension)(downloadUrls, asJson, api, token, publish);
         //core.setOutput('outputJson', asJson)
     }
     catch (error) {
-        // Fail the workflow run if an error occurs
-        if (error instanceof Error)
-            core.setFailed(error.message);
+        core.setFailed(`${error}`);
     }
 }
 
