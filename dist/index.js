@@ -30679,6 +30679,11 @@ async function run() {
             throw new Error('Spec must be either a .json or .lua file');
         }
         core.debug(`Parsed spec: ${JSON.stringify(metaData)}`);
+        if (isTest) {
+            // console.log(asJson)
+            // The following only works with secret keys etc.
+            return;
+        }
         await (0, extensionstore_1.createOrUpdateExtension)(downloadUrls, metaData, api, token, publish);
         if (process_1.env.GITHUB_STEP_SUMMARY) {
             core.summary
@@ -30689,15 +30694,10 @@ async function run() {
         else {
             core.warning('No $GITHUB_STEP_SUMMARY found');
         }
-        if (isTest) {
-            // console.log(asJson)
-            // The following only works with secret keys etc.
-            return;
-        }
         //core.setOutput('outputJson', asJson)
     }
     catch (error) {
-        core.setFailed(`${error}`);
+        core.setFailed(`${error.stack}`);
     }
 }
 

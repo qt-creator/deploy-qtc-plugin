@@ -51,6 +51,13 @@ export async function run(): Promise<void> {
     }
 
     core.debug(`Parsed spec: ${JSON.stringify(metaData)}`)
+
+    if (isTest) {
+      // console.log(asJson)
+      // The following only works with secret keys etc.
+      return
+    }
+
     await createOrUpdateExtension(downloadUrls, metaData, api, token, publish)
 
     if (env.GITHUB_STEP_SUMMARY) {
@@ -65,14 +72,8 @@ export async function run(): Promise<void> {
       core.warning('No $GITHUB_STEP_SUMMARY found')
     }
 
-    if (isTest) {
-      // console.log(asJson)
-      // The following only works with secret keys etc.
-      return
-    }
-
     //core.setOutput('outputJson', asJson)
   } catch (error) {
-    core.setFailed(`${error}`)
+    core.setFailed(`${(error as Error).stack}`)
   }
 }
