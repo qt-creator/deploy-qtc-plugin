@@ -5,6 +5,8 @@ import {
   PluginMetaData,
   DownloadUrls
 } from './extensionstore'
+import { jsonFromSpec } from './luaspec'
+import { env } from 'process'
 
 // Import fs
 
@@ -36,23 +38,38 @@ export async function run(): Promise<void> {
     }
 
     const spec = await fs.readFile(specPath)
-    const asJson = JSON.parse(spec.toString())
+    let metaData: PluginMetaData
 
-    core.debug(`Parsed spec: ${JSON.stringify(asJson)}`)
+    if (specPath.endsWith('.json')) {
+      const asJson = JSON.parse(spec.toString())
+      metaData = asJson as PluginMetaData
+    } else if (specPath.endsWith('.lua')) {
+      const asJson = JSON.parse(jsonFromSpec(spec.toString()))
+      metaData = asJson as PluginMetaData
+    } else {
+      throw new Error('Spec must be either a .json or .lua file')
+    }
+
+    core.debug(`Parsed spec: ${JSON.stringify(metaData)}`)
+    await createOrUpdateExtension(downloadUrls, metaData, api, token, publish)
+
+    if (env.GITHUB_STEP_SUMMARY) {
+      core.summary
+        .addHeading('Extension created or updated')
+        .addLink(
+          'Check API',
+          `${api}/api/v1/plugins/${metaData.VendorId}.${metaData.Id}/versions`
+        )
+        .write()
+    } else {
+      core.warning('No $GITHUB_STEP_SUMMARY found')
+    }
 
     if (isTest) {
       // console.log(asJson)
       // The following only works with secret keys etc.
       return
     }
-
-    await createOrUpdateExtension(
-      downloadUrls,
-      asJson as unknown as PluginMetaData,
-      api,
-      token,
-      publish
-    )
 
     //core.setOutput('outputJson', asJson)
   } catch (error) {
