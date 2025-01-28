@@ -20,22 +20,22 @@ inputs:
     required: true
   download-url-win-x64:
     description: 'The url to download the extension from (for Windows x64)'
-    required: true
+    required: false
   download-url-win-arm64:
     description: 'The url to download the extension from (for Windows ARM64)'
-    required: true
+    required: false
   download-url-macos-x64:
     description: 'The url to download the extension from (for macOS x86)'
-    required: true
+    required: false
   download-url-macos-arm64:
     description: 'The url to download the extension from (for macOS ARM64)'
-    required: true
+    required: false
   download-url-linux-x64:
     description: 'The url to download the extension from (for Linux x64)'
-    required: true
+    required: false
   download-url-linux-arm64:
     description: 'The url to download the extension from (for Linux ARM64)'
-    required: true
+    required: false
   publish:
     description: 'Whether to immediately set status to "published"'
     required: false
