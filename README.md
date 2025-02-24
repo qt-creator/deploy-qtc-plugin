@@ -19,7 +19,7 @@ from the Qt Creator Extension Store.
 
 ```yaml
 - name: Release on Extension Store
-  uses: qt-creator/deploy-qtc-plugin@v0.1
+  uses: qt-creator/deploy-qtc-plugin@v1.0
   with:
     token: ${{ secrets.EXTENSION_STORE_API_TOKEN }}
     spec: build/MyPlugin.json
