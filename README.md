@@ -1,4 +1,9 @@
-# Deploy Qtc Plugin
+# This Action is no longer used!
+
+Qt Creator starting with 17.0 uses a simply git repository to register plugins instead:
+https://github.com/qt-creator/extension-registry
+
+## Deploy Qtc Plugin
 
 [![GitHub Super-Linter](https://github.com/qt-creator/deploy-qtc-plugin/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/qt-creator/deploy-qtc-plugin/actions/workflows/ci.yml/badge.svg)
@@ -9,7 +14,7 @@
 An action to help you deploy your Qt Creator extension to the Qt Creator
 Extension Store.
 
-## Getting started
+### Getting started
 
 Once you have prepare your Lua extension for deployment, you can use this action
 to deploy it to the Qt Creator Extension Store.
